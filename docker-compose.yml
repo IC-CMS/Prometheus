@@ -1,0 +1,14 @@
+version: '3'
+services:
+  prometheus:
+    build: ./
+    image: sredna/prometheus:latest
+    restart: always
+    network_mode: "host"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ${PROMETHEUS_ALERTS:-./config/alert.rules}:/etc/prometheus/alert.rules
+      - ${PROMETHEUS_CONFIG:-./config/prometheus.yml}:/etc/prometheus/prometheus.yml
+
+    #environment:

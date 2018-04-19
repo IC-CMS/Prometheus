@@ -1,0 +1,96 @@
+global:
+  scrape_interval:     15s # By default, scrape targets every 15 seconds.
+  evaluation_interval: 15s # By default, scrape targets every 15 seconds.
+
+  # Attach these labels to any time series or alerts when communicating with
+  # external systems (federation, remote storage, Alertmanager).
+  external_labels:
+    monitor: 'dna-monitor'
+
+rule_files:
+  - '/etc/prometheus/alert.rules'
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+
+  #self monitor
+  - job_name: prometheus
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          group: 'self-monitor'
+
+  #node test monitor
+  - job_name: cAdvisor
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.113.127.191:8080']
+        labels:
+          group: 'cAdvisor-monitor'
+
+  - job_name: nginx
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['10.113.127.244:9913']
+        labels:
+          group: 'NGINX-monitor'
+
+#  #EC2 Test monitor
+#  - job_name: ec2Test
+#
+#    ec2_sd_configs:
+#      - region: us-east-1b
+#       # The port to scrape metrics from. If using the public IP address, this must
+#       # instead be specified in the relabeling rule.
+#        port: 9100
+#
+#       # The AWS API keys. If blank, the environment variables `AWS_ACCESS_KEY_ID`
+#       # and `AWS_SECRET_ACCESS_KEY` are used.
+#       #access_key: PUT_ACCESS_KEY_HERE
+#       #secret_key: PUT_SECRET_KEY_HERE
+#       # Named AWS profile used to connect to the API.
+#       #profile:
+#
+#    relabel_configs:
+##      #Only monitor instances with a Name starting with "Test"
+##      -source_labels: [__meta_ec2_tag_Name]
+##       regex: Test*
+##       action: keep
+#
+#      #Keep only instances flagged for monitoring
+#      - source_labels: [__meta_ec2_tag_prometheus_scrape]
+#        regex: 'true'
+#        action: keep
+#
+#      #Use the instance ID as the label
+#      - source_labels: [__meta_ec2_instance_id]
+#        target_label: instance
+
+#  -job_name: "openstack"
+#    scrape_interval: 5s
+#
+#    openstack_sd_configs:
+#      -identity_endpoint: https://
+#       username:
+#       project_name:
+#       password:
+#       role:
+#
+#    relabel_configs:
+#      #If Needed: Keep only active instances.
+#      -source_labels: [__meta_openstack_instance_status]
+#       regex: ACTIVE
+#       action: keep
+#
+#      #Keep only instances flagged for scraping
+#      -source_labels: [__meta_openstack_tag_prometheus_scrape]
+#       regex: 'true'
+#       action: keep
+#
+#      #Relabel the default instance with the Instance Name
+#      -source_labels: [__meta_openstack_instance_name]
+#       target_label: instance
