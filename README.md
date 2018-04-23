@@ -1,7 +1,8 @@
 # Prometheus
 Prometheus container
 
-Dev Notes:
+Dev Notes
+
     Prometheus -
         When using the environment variable PROMETHEUS_CONFIG to set the test configuration, after exporting the variable, I had to use '-E' in the docker-compose command.
         sudo -E docker-compose up
@@ -10,21 +11,35 @@ Dev Notes:
         All of the builders are contained in 'prometheus-template.json'.
         To use just one of the builders: packer build -only={builder name} prometheus-template.json
         Or to not use one of the builders: packer build -except={builder name} prometheus-template.json
-
-        The folowing variables are REQUIRED to be set
+        
+        Create a variable file and add the folowing variables per build
         all:
             newuser_name
 
         aws_builder:
-            region
-            source_image_name
+            #The keys and tokens are not neccesary if the profile credentials work
+            aws_access_key      --|  These should be set as environment variables instead.
+            aws_secret_key        |- Using the standard 
+            aws_session_token   --|  AWS_ACCESS_KEY_ID,  AWS_SECRET_ACCESS_KEY,  AWS_SESSION_TOKEN
+            newuser_name
+            newuser_pass
+            aws_region
+            aws_security_group
+            aws_vpc_id
+            aws_subnet_id
+            aws_source_image
 
         aws2_builder:
-            aws_access_key
-            aws_secret_key
-            aws_access_token
-            region
-            source_image_name
+            aws_access_key      --|  These should be set as environment variables instead.
+            aws_secret_key        |- Using the standard 
+            aws_session_token   --|  AWS_ACCESS_KEY_ID,  AWS_SECRET_ACCESS_KEY,  AWS_SESSION_TOKEN
+            newuser_name
+            newuser_pass
+            aws_region
+            aws_security_group
+            aws_vpc_id
+            aws_subnet_id
+            aws_source_image
 
         open_builder:
             bot_user_pass
@@ -35,12 +50,14 @@ Dev Notes:
             open_tenant_name
             id_endpoint
 
-        ex.
+        Usage:
+            packer build -only=aws_builder -var-file={path to var file} {path to prometheus-template.json}
+            or        
             packer build -only=aws_builder \
             -var 'newuser_name=foo' \
             -var 'region=us-east-1b' \
             -var 'source_image_name=ubuntu-1234' \
-            prometheus-template.json
+            {path to prometheus-template.json}
 
     cAdvisor -
         May need to use --privileged=true and --volume=/cgroup:/cgroup:ro on CentOS to give cAdvisor proper access

@@ -1,0 +1,90 @@
+#!/bin/bash
+#
+# Started with script from https://gist.github.com/sovcik/733956
+# How to use:
+# 1) set INSTALLER_ACCOUNT or use an environment variable
+# 2) set PUB_KEY_URL to point to dowloadable file containing public key in SSH format
+# 3) set the full encryption key id (the form arn:aws:kms:us-east...)
+# 4) set the packer template to use this file as user-data-file
+
+
+INSTALLER_ACCOUNT="userName"
+PUB_KEY_URL="s3://packer-data/installer-key"
+KEY_ID=""
+
+#Install aws cli so that we can reach the public key
+function install_awsCli(){
+  echo "Installing AWS CLI."
+  local _pip="$(which pip)"
+  [ ! "${_pip}" ] && echo "Error: pip is not installed." && return 1
+
+  ${_pip} install awscli --upgrade --user
+  [ $? -ne 0 ] && echo "Error: pip install failed." && return 1
+
+  return 0
+}
+
+# Create installer account and create its authorized_keys
+function create_account() {
+  local _account="$1"
+  local _key_url="$2"
+  local _tmpkey="/tmp/public_key.pub"
+
+  # create account
+  echo "Creating an account."
+  [ -d /home/${_account} ] || sudo useradd --create-home ${_account}
+  [ $? -ne 0 ] && echo "Error: Account creation failed." && return 1
+
+  # create ssh folder for newly created account
+  echo "Creating folder for ssh"
+  [ -d /home/${_account}/.ssh ] || sudo mkdir /home/${_account}/.ssh
+  [ $? -ne 0 ] && echo "Error: Not possible to create folder /home/${_account}/.ssh" && return 1
+  sudo chown -R ${_account}:${_account} /home/${_account}/.ssh
+  sudo chmod -R 700 /home/${_account}/.ssh
+
+  # get public key from spcified url
+  echo "Getting public key from ${_key_url}"
+  [ -e ${_tmpkey} ] && sudo rm ${_tmpkey}
+  ${AWS} s3 cp ${_key_url} ${_tmpkey} --sse-kms-key-id ${KEY_ID} --sse aws:kms
+  #${AWS} s3 cp ${_key_url} ${_tmpkey}
+  [ $? -ne 0 ] && echo "Error: Unable to download public key from ${_key_url}" && return 1
+
+  # append public key to ~/.ssh/authorized_keys in order to allow newly created user to log-in
+  echo "Adding public key to authorized_keys for created account."
+  sudo cat ${_tmpkey} >> /home/${_account}/.ssh/authorized_keys
+  [ ! -e "/home/${_account}/.ssh/authorized_keys" ] && echo "Error: Creating of /home/${_account}/.ssh/authorized_keys failed." && return 1
+
+  return 0
+}
+
+# Configure SUDOERS so newly created account will get necessary permissions
+function configure_sudoers() {
+  local _account="$1"
+  local _sudoers="/etc/sudoers"
+  local _sudo_permissions="ALL=NOPASSWD: ALL"
+
+  [ ! -e $_sudoers ] && echo "Error: File ${_sudoers} does not exist." && return 1
+
+  if [ ! "`sudo ${SED} -n -e ""/^${_account}/p"" ${_sudoers}`" ]; then
+    sudo ${SED} -i -e "\$a${_account} ${_sudo_permissions}" ${_sudoers}
+    [ $? -ne 0 ] && echo "Error: Not possible to modify ${_sudoers}." && return 1
+  fi
+
+  return 0
+}
+
+install_awsCli
+
+SED="$(which sed)"
+AWS="$(which aws)"
+
+[ ! "${SED}" ] && echo "Error: SED not installed." && exit 1
+[ ! "${AWS}" ] && echo "Error: AWS not installed." && exit 1
+
+create_account ${INSTALLER_ACCOUNT} ${PUB_KEY_URL}
+[ $? -ne 0 ] && echo "Error: Account creation failed." && exit 1
+
+configure_sudoers ${INSTALLER_ACCOUNT}
+[ $? -ne 0 ] && echo "Error: Unable to configure sudoers for ${INSTALLER_ACCOUNT} account." && exit 1
+
+echo "*** Installer account ''${INSTALLER_ACCOUNT}'' created."
