@@ -12,34 +12,37 @@ Dev Notes
         To use just one of the builders: packer build -only={builder name} prometheus-template.json
         Or to not use one of the builders: packer build -except={builder name} prometheus-template.json
         
-        Create a variable file and add the folowing variables per build
-        all:
-            newuser_name
-
+        Now using two variable file
+        1. Create a variable file for the credentials and include
+            aws_access_key
+            aws_secret_key
+            aws_session_token
+            
+        2. Create a variable file and add the folowing variables per build
+        
         aws_builder:
-            #The keys and tokens are not neccesary if the profile credentials work
-            aws_access_key      --|  These should be set as environment variables instead.
-            aws_secret_key        |- Using the standard 
-            aws_session_token   --|  AWS_ACCESS_KEY_ID,  AWS_SECRET_ACCESS_KEY,  AWS_SESSION_TOKEN
             newuser_name
             newuser_pass
+            new_image_name
             aws_region
             aws_security_group
             aws_vpc_id
             aws_subnet_id
             aws_source_image
+            aws_zone
+            
 
         aws2_builder:
-            aws_access_key      --|  These should be set as environment variables instead.
-            aws_secret_key        |- Using the standard 
-            aws_session_token   --|  AWS_ACCESS_KEY_ID,  AWS_SECRET_ACCESS_KEY,  AWS_SESSION_TOKEN
             newuser_name
             newuser_pass
+            new_image_name
             aws_region
             aws_security_group
             aws_vpc_id
             aws_subnet_id
             aws_source_image
+            aws_zone
+            aws_endpoint
 
         open_builder:
             bot_user_pass
@@ -51,12 +54,13 @@ Dev Notes
             id_endpoint
 
         Usage:
-            packer build -only=aws_builder -var-file={path to var file} {path to prometheus-template.json}
+            packer build -only=aws_builder -var-file={path to credentials file} -var-file={path to var file} {path to prometheus-template.json}
             or        
             packer build -only=aws_builder \
             -var 'newuser_name=foo' \
             -var 'region=us-east-1b' \
             -var 'source_image_name=ubuntu-1234' \
+            -var ...
             {path to prometheus-template.json}
 
     cAdvisor -
