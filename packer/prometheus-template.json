@@ -11,7 +11,7 @@
     "aws_subnet_id": "",
     "aws_endpoint": "",
     "bot_user_pass": "",
-    "new_image_name": "",
+    "new_image_name": "DNA_Base_Prometheus",
     "newuser_name": "",
     "newuser_pass": "",
     "open_flavor": "",
@@ -30,7 +30,7 @@
     "vpc_id": "{{user `aws_vpc_id`}}",
     "subnet_id": "{{user `aws_subnet_id`}}",
     "type": "amazon-ebs",
-    "ami_name": "{{user `new_image_name`}}_{{timestamp}}",
+    "ami_name": "{{user `new_image_name`}}_{{isotime | clean_ami_name}}",
     "instance_type": "t2.micro",
     "region": "{{user `aws_region`}}",
     "availibility_zone": "{{user `aws_zone`}}",
@@ -54,7 +54,7 @@
       "vpc_id": "{{user `aws_vpc_id`}}",
       "subnet_id": "{{user `aws_subnet_id`}}",
       "type": "amazon-ebs",
-      "ami_name": "{{user `new_image_name`}}_{{timestamp}}",
+      "ami_name": "{{user `new_image_name`}}_{{isotime | clean_ami_name}}",
       "instance_type": "t2.micro",
       "region": "{{user `aws_region`}}",
       "availibility_zone": "{{user `aws_zone`}}",
@@ -73,7 +73,7 @@
       "username": "bot",
       "password": "{{user `bot_user_pass`}}",
       "type": "openstack",
-      "image_name": "{{user `new_image_name`}}_{{timestamp}}",
+      "image_name": "{{user `new_image_name`}}_{{isotime | clean_ami_name}}",
       "flavor": "{{user `open_flavor`}}",
       "region": "{{user `open_region`}}",
       "source_image": "{{user `open_source_image`}}",
@@ -83,5 +83,20 @@
       "ssh_password": "{{user `newuser_pass`}}",
       "ssh_pty": "true",
       "cacert": "{{user `cert_location`}}"
-    }]
+    }],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "./scripts",
+      "destination": "/tmp"
+    },
+    {
+      "type": "shell",
+      "inline": ["echo *****************************  *********************************",
+                  "cd /tmp/scripts/",
+                  "./dockermod.sh {{user `containeryard_pass`}}"
+
+      ]
+    }
+  ]
 }
