@@ -18,7 +18,10 @@
     "open_region": "",
     "open_source_image": "",
     "open_tenant_name": "",
-    "id_endpoint": ""
+    "id_endpoint": "",
+    "dockerRepo_user": "",
+    "dockerRepo_pass": "",
+    "dockerRepo_endpoint": ""
 
   },
   "builders": [{
@@ -87,14 +90,14 @@
   "provisioners": [
     {
       "type": "file",
-      "source": "./scripts",
+      "source": "./provisions",
       "destination": "/tmp"
     },
     {
       "type": "shell",
-      "inline": ["echo *****************************  *********************************",
+      "inline": ["echo ***************************** Preparing Prometheus *********************************",
                   "cd /tmp/scripts/",
-                  "./dockermod.sh {{user `containeryard_pass`}}"
+                  "./prometheus_setup.sh -u {{user `dockerRepo_user`}} -p {{user `dockerRepo_pass`}} -r {{user `dockerRepo_endpoint`}}"
 
       ]
     }

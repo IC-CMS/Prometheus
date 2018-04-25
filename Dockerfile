@@ -1,3 +1,6 @@
+#Currently can use the standard prometheus image
+#If we need to expand the dockerfile setup, use this file
+
 ARG CODE_VERSION=latest
 FROM prom/prometheus:${CODE_VERSION}
 LABEL maintainer="sredna"

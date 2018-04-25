@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Started with script from https://gist.github.com/sovcik/733956
+# This is not working on AWS at the moment. It never seems to show up in the cloud-init.log
 # How to use:
 # 1) set INSTALLER_ACCOUNT or use an environment variable
 # 2) set PUB_KEY_URL to point to dowloadable file containing public key in SSH format
