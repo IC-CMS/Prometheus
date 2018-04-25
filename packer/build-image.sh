@@ -1,4 +1,12 @@
 #!/bin/bash
+#
+#Instructions
+#Using the Packer Template file for the project
+#Use a build name from the packer template that you wish to build
+#Create a credentials variable file for the platform desired.
+# ex. aws use the fetch_credentials script to create the file from the current Instance Role
+#Create a packer variable file that contains all of the user variables needed for the build in the packer template
+#The variable file for each platform exists in this Prometheus project
 
 function usage() {
     echo "USAGE: "
