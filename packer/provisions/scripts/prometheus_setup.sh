@@ -1,15 +1,21 @@
 #!/bin/bash
 
 function usage() {
+    echo " "
     echo "USAGE: "
     echo "-r <docker repository endpoint>   *required if not using the standard Docker Hub"
     echo "-u <user name for repository>     *required if not using the standard Docker Hub"
     echo "-p <user password for repository> *required if not using the standard Docker Hub"
     echo "-h display this help message"
+    echo " "
     return 0
 }
 
-CONTAINER_NAME=prometheus
+AWS='aws_builder'
+AWS2='aws2_builder'
+OPEN='open_builder'
+DOCKER='docker'
+
 while getopts ":u:p:r:h?" opt ;
 do
     case "$opt" in
@@ -30,30 +36,39 @@ do
 done
 shift $((OPTIND-1))
 
-if [ -n "${CONTAINER_REPO}" ]
-then
-    if [[ -z "${USER_NAME}"  ||  -z "${USER_PASS}" ]]
-    then
-        echo "*** missing required arguments:"
-        usage
-        exit 1
-    fi
+case "$PACKER_BUILD_NAME" in
+    ${AWS2} )
+                    echo "Using tls for docker in ${PACKER_BUILD_NAME}"
+                    DOCKER='docker --tls'
+                    ;;
+    ${AWS}|${OPEN}|* )
+                    echo "Not using tls for docker in ${PACKER_BUILD_NAME}"
+                    ;;
+esac
 
-    #Login to contianer repository
-    sudo docker login -u ${USER_NAME} -p ${USER_PASS} ${CONTAINER_REPO}
-fi
+#Without this, docker pull throws an error
+sleep 60
 
 #Pull the docker image
-sudo docker pull prom/prometheus:latest
-
-#Position files
-sudo mkdir /opt/${CONTAINER_NAME}
-sudo cp /tmp/provisions/docker-compose.yml /opt/${CONTAINER_NAME}
-sudo cp /tmp/provisions/config /opt/${CONTAINER_NAME}
+sudo ${DOCKER} pull prom/prometheus:latest
 
 #Attach storage: Keep if we decide to make the storage persistent
-sudo mkfs -t ext4 /dev/xvdf #Remove this if for some reason we suspect we might need to use this script on a previous drive (ex. a snapshot)
+#sudo mkfs -t ext4 /dev/xvdf #Remove this if for some reason we suspect we might need to use this script on a previous drive (ex. a snapshot)
 sudo mkdir -m 777 /data
 # add the device on every reboot
-echo "/dev/xvdf /data ext3 defaults,nofail 0 2" | sudo tee -a /etc/fstab
-sudo mount -a
+#echo "/dev/xvdf /data ext3 defaults,nofail 0 2" | sudo tee -a /etc/fstab
+#sudo mount -a
+
+#Clean out the certs and run the docker container for Prometheus
+sudo rm -Rf /root/.docker
+
+cd /tmp/provisions
+sudo ${DOCKER} run -d \
+        --name prometheus \
+        -p 9090:9090 \
+        --restart=on-failure:10 \
+        --network="host" \
+        -v /tmp/provisions/config/alert.rules:/etc/prometheus/alert.rules \
+        -v /tmp/provisions/config/prometheus.yml:/etc/prometheus/prometheus.yml
+        -v /data:/prom/prometheus/data \
+        prom/prometheus:latest

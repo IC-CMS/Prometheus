@@ -1,15 +1,14 @@
 version: '3'
 services:
   prometheus:
-    build: ../..
-    image: sredna/prometheus:latest
+    image: prom/prometheus:latest
     command: --storage.tsdb.retention=15d
     restart: always
     network_mode: "host"
     ports:
       - "9090:9090"
     volumes:
-      - ${PROMETHEUS_ALERTS:-./config/alert.rules}:/etc/prometheus/alert.rules
-      - ${PROMETHEUS_CONFIG:-./config/prometheus.yml}:/etc/prometheus/prometheus.yml
+      - ${PROMETHEUS_ALERTS:-/tmp/provisions/config/alert.rules}:/etc/prometheus/alert.rules
+      - ${PROMETHEUS_CONFIG:-/tmp/provisions/config/prometheus.yml}:/etc/prometheus/prometheus.yml
       - ${PROMETHEUS_DATA:-/data}:/prom/prometheus/data
 #    environment:

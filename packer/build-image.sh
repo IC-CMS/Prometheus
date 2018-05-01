@@ -14,29 +14,35 @@ function usage() {
     echo "-t <packer template name>    default = packer-template.json"
     echo "-c <credential file name>    default = packer_credentials.json"
     echo "-v <variable file name>      default = packer_var.json"
+    echo "-p <packer container>        default = hashicorp/packer"
     echo "-h display this help message"
     return 0
 }
 
-DEBUG= ""
-TEMPLATE='packer_template.json'
+DEBUG=''
+CONTAINER='hashicorp/packer'
+TEMPLATE='prometheus_template.json'
 CREDENTIALS='packer_credentials.json'
-VARIABLES='packer_var.json'
+VARIABLES='packer_var_aws.json'
+ADD_TRUST=' '
 
-while getopts ":b:t:c:v:h?" opt ;
+while getopts ":b:t:c:v:p:d:h?" opt ;
 do
     case "$opt" in
         b)
-            BUILD_NAME="$(OPTARG)"
+            BUILD_NAME="${OPTARG}"
             ;;
         t)
-            TEMPLATE="$(OPTARG)"
+            TEMPLATE="${OPTARG}"
             ;;
         c)
-            CREDENTIALS="$(OPTARG)"
+            CREDENTIALS="${OPTARG}"
             ;;
         v)
-            VARIABLES="$(OPTARG)"
+            VARIABLES="${OPTARG}"
+            ;;
+        p)
+            CONTAINER="${OPTARG}"
             ;;
         d)
             DEBUG="--debug"
@@ -55,14 +61,33 @@ then
     echo "*** The -b <build name> argument is required"
     usage
     exit 1
+elif [ "aws2_builder" = "${BUILD_NAME}" ]
+then
+    echo "Adding Trust store"
+    ADD_TRUST='-v '$(pwd)'/AllTrusted.crt:/etc/pki/tls/certs/AllTrusted.crt'
 fi
 
-sudo docker run -it --env-file=docker.env \
+echo " "
+echo "Debug             : ${DEBUG}"
+echo "Packer Container  : ${CONTAINER}"
+echo "Template          : ${TEMPLATE}"
+echo "Build name        : ${BUILD_NAME}"
+echo "Credentials file  : ${CREDENTIALS}"
+echo "Variables file    : ${VARIABLES}"
+echo "Using Trust arg   : ${ADD_TRUST}"
+echo " "
+
+sudo docker run -it \
+    --name promBuilder \
+    --env-file=docker.env \
     -v $(pwd):/tmp/prometheus \
-    -v Apache_Bundle_AllTrustedPartners.crt:/etc/pki/tls/certs/Apache_Bundle_AllTrustedPartners.crt
-    hashicorp/packer:latest build \
+    ${ADD_TRUST} \
+    -w /tmp/prometheus \
+    ${CONTAINER} build \
         $DEBUG \
-        -only=${BUILD_NAME}
+        -only=${BUILD_NAME} \
         -var-file=${CREDENTIALS} \
         -var-file=${VARIABLES} \
         ${TEMPLATE}
+
+sudo docker rm promBuilder

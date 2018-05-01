@@ -10,8 +10,10 @@
     "aws_vpc_id": "",
     "aws_subnet_id": "",
     "aws_endpoint": "",
+    "source_ami_owner": "",
+    "source_name_filter": "",
     "bot_user_pass": "",
-    "new_image_name": "DNA_Base_Prometheus",
+    "new_image_name": "DNA_Prometheus",
     "newuser_name": "",
     "newuser_pass": "",
     "open_flavor": "",
@@ -36,7 +38,7 @@
     "ami_name": "{{user `new_image_name`}}_{{isotime | clean_ami_name}}",
     "instance_type": "t2.micro",
     "region": "{{user `aws_region`}}",
-    "availibility_zone": "{{user `aws_zone`}}",
+    "availability_zone": "{{user `aws_zone`}}",
     "source_ami": "{{user `aws_source_image`}}",
     "ssh_username": "{{user `newuser_name`}}",
     "ssh_password": "{{user `newuser_pass`}}",
@@ -45,8 +47,14 @@
     "tags": {
       "internal": "prometheus",
       "nostartup": "true"
+    },
+    "source_ami_filter": {
+        "filters": {
+            "name": "{{user `source_name_filter`}}"
+        },
+        "owners": ["{{user `source_ami_owner`}}"],
+        "most_recent": true
     }
-
   },
     {
       "name": "aws2_builder",
@@ -60,16 +68,22 @@
       "ami_name": "{{user `new_image_name`}}_{{isotime | clean_ami_name}}",
       "instance_type": "t2.micro",
       "region": "{{user `aws_region`}}",
-      "availibility_zone": "{{user `aws_zone`}}",
+      "availability_zone": "{{user `aws_zone`}}",
       "associate_public_ip_address": "true",
       "source_ami": "{{user `aws_source_image`}}",
       "ssh_username": "{{user `newuser_name`}}",
-      "ssh_timeout": "5m",
+      "skip_region_validation": "true",
       "custom_endpoint_ec2": "{{user `aws_endpoint`}}",
       "tags": {
         "internal": "prometheus"
+      },
+      "source_ami_filter": {
+        "filters": {
+          "name": "{{user `source_name_filter`}}"
+        },
+        "owners": ["{{user `source_ami_owner`}}"],
+        "most_recent": true
       }
-
     },
     {
       "name": "open_builder",
@@ -96,9 +110,10 @@
     {
       "type": "shell",
       "inline": ["echo ***************************** Preparing Prometheus *********************************",
-                  "cd /tmp/scripts/",
-                  "./prometheus_setup.sh -u {{user `dockerRepo_user`}} -p {{user `dockerRepo_pass`}} -r {{user `dockerRepo_endpoint`}}"
-
+                  "cd /tmp/provisions/scripts/",
+                  "./prometheus_setup.sh",
+                 "echo ************************** Removing cloud directory ********************************",
+                 "sudo rm -Rf /var/lib/cloud/*"
       ]
     }
   ]

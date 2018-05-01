@@ -1,10 +1,19 @@
 # Prometheus
 Prometheus container
 
+    The AWS image builds but fails at 'docker pull'. A dna_base image has not been created yet. Once dna_base
+    is ready, the docker commands will work.
+    
+    All trusted Cert name to be changed for each environment if needed
+    
+    The packer environment variables need to be set up for each platform you are building on. Include the user
+    name and user password for the AWS platform and just the user name for the AWS2 platform.
+    
 Dev Notes
 
     Prometheus -
-        When using the environment variable PROMETHEUS_CONFIG to set the test configuration, after exporting the variable, I had to use '-E' in the docker-compose command.
+        When using the environment variable PROMETHEUS_CONFIG to set the test configuration, 
+        after exporting the variable, I had to use '-E' in the docker-compose command.
         sudo -E docker-compose up
 
     Packer -
@@ -12,7 +21,7 @@ Dev Notes
         To use just one of the builders: packer build -only={builder name} prometheus-template.json
         Or to not use one of the builders: packer build -except={builder name} prometheus-template.json
         
-        Now using two variable file
+        Now using two variable files
         1. Create a variable file for the credentials and include
             aws_access_key
             aws_secret_key
@@ -23,26 +32,25 @@ Dev Notes
         aws_builder:
             newuser_name
             newuser_pass
-            new_image_name
             aws_region
             aws_security_group
             aws_vpc_id
             aws_subnet_id
-            aws_source_image
             aws_zone
+            source_ami_owner
+            source_name_filter
             
 
         aws2_builder:
             newuser_name
-            newuser_pass
-            new_image_name
             aws_region
             aws_security_group
             aws_vpc_id
             aws_subnet_id
-            aws_source_image
             aws_zone
             aws_endpoint
+            source_ami_owner
+            source_name_filter
 
         open_builder:
             bot_user_pass

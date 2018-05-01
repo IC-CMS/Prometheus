@@ -5,7 +5,10 @@
 # This is an adaptation of https://gist.github.com/ddgenome/f13f15dd01fb88538dd6fac8c7e73f8c
 # Will only work in aws environments that are using roles
 #
-# usage: eval $(./fetch_credentials.sh ROLE_NAME)
+# usage:
+# To add credentials to the environment variables -> eval $(./aws_credentials.sh ROLE_NAME)
+# or
+# just add to file -> ./aws_credentials.sh ROLE_NAME
 
 pkg=aws-credentials
 if [[ ! $1 ]]
