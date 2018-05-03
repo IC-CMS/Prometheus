@@ -13,6 +13,7 @@
     "source_ami_owner": "",
     "source_name_filter": "",
     "bot_user_pass": "",
+    "bot_user_name": "",
     "new_image_name": "DNA_Prometheus",
     "newuser_name": "",
     "newuser_pass": "",
@@ -21,9 +22,7 @@
     "open_source_image": "",
     "open_tenant_name": "",
     "id_endpoint": "",
-    "dockerRepo_user": "",
-    "dockerRepo_pass": "",
-    "dockerRepo_endpoint": ""
+    "temp_floating_ip": ""
 
   },
   "builders": [{
@@ -87,7 +86,7 @@
     },
     {
       "name": "open_builder",
-      "username": "bot",
+      "username": "{{user `bot_user_name`}}",
       "password": "{{user `bot_user_pass`}}",
       "type": "openstack",
       "image_name": "{{user `new_image_name`}}_{{isotime | clean_ami_name}}",
@@ -99,7 +98,8 @@
       "ssh_username": "{{user `newuser_name`}}",
       "ssh_password": "{{user `newuser_pass`}}",
       "ssh_pty": "true",
-      "cacert": "{{user `cert_location`}}"
+      "cacert": "{{user `cert_location`}}",
+      "floating_ip": "{{user `temp_floating_ip'}}"
     }],
   "provisioners": [
     {

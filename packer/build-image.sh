@@ -10,11 +10,11 @@
 
 function usage() {
     echo "USAGE: "
-    echo "-b <build name>              *REQUIRED"
-    echo "-t <packer template name>    default = packer-template.json"
-    echo "-c <credential file name>    default = packer_credentials.json"
-    echo "-v <variable file name>      default = packer_var.json"
-    echo "-p <packer container>        default = hashicorp/packer"
+    echo "-b <build name>                       *REQUIRED"
+    echo "-t <packer template name>             default = packer-template.json"
+    echo "-p <password/credential file name>    default = packer_credentials.json"
+    echo "-v <variable file name>               default = packer_var.json"
+    echo "-c <packer container>                 default = hashicorp/packer"
     echo "-h display this help message"
     return 0
 }
@@ -35,13 +35,13 @@ do
         t)
             TEMPLATE="${OPTARG}"
             ;;
-        c)
+        p)
             CREDENTIALS="${OPTARG}"
             ;;
         v)
             VARIABLES="${OPTARG}"
             ;;
-        p)
+        c)
             CONTAINER="${OPTARG}"
             ;;
         d)
