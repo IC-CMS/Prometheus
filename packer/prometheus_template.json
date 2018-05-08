@@ -44,7 +44,7 @@
     "ssh_timeout": "10m",
     "ssh_handshake_attempts": "50",
     "tags": {
-      "internal": "prometheus",
+      "internal": "prometheus_{{isotime | clean_ami_name}}",
       "nostartup": "true"
     },
     "source_ami_filter": {
@@ -74,7 +74,7 @@
       "skip_region_validation": "true",
       "custom_endpoint_ec2": "{{user `aws_endpoint`}}",
       "tags": {
-        "internal": "prometheus"
+        "internal": "prometheus_{{isotime | clean_ami_name}}"
       },
       "source_ami_filter": {
         "filters": {
