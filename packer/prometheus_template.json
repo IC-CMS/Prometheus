@@ -104,7 +104,7 @@
   "provisioners": [
     {
       "type": "shell",
-      "inline": ["echo '************************ cleaning up leftovers if there***************************",
+      "inline": ["echo '************************ cleaning up leftovers if there***************************'",
         "cd / && sudo rm -Rf /tmp/provisions"
       ]
     },
