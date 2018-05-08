@@ -42,7 +42,7 @@
     "ssh_username": "{{user `newuser_name`}}",
     "ssh_password": "{{user `newuser_pass`}}",
     "ssh_timeout": "10m",
-    "ssh_handshake_attempts": "50",
+    "ssh_handshake_attempts": "10",
     "tags": {
       "internal": "prometheus_{{isotime | clean_ami_name}}",
       "nostartup": "true"
@@ -103,16 +103,22 @@
     }],
   "provisioners": [
     {
+      "type": "shell",
+      "inline": ["echo '************************ cleaning up leftovers if there***************************",
+        "cd / && sudo rm -Rf /tmp/provisions"
+      ]
+    },
+    {
       "type": "file",
       "source": "./provisions",
       "destination": "/tmp"
     },
     {
       "type": "shell",
-      "inline": ["echo ***************************** Preparing Prometheus *********************************",
+      "inline": ["echo '***************************** Preparing Prometheus *********************************'",
                   "cd /tmp/provisions/scripts/",
                   "./prometheus_setup.sh",
-                 "echo ************************** Removing cloud directory ********************************",
+                 "echo '************************** Removing cloud directory ********************************'",
                  "sudo rm -Rf /var/lib/cloud/*"
       ]
     }

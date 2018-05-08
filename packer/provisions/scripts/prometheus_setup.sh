@@ -62,13 +62,12 @@ sudo mkdir -m 777 /data
 #Clean out the certs and run the docker container for Prometheus
 sudo rm -Rf /root/.docker
 
-cd /tmp/provisions
 sudo ${DOCKER} run -d \
         --name prometheus \
         -p 9090:9090 \
         --restart=on-failure:10 \
         --network="host" \
         -v /tmp/provisions/config/alert.rules:/etc/prometheus/alert.rules \
-        -v /tmp/provisions/config/prometheus.yml:/etc/prometheus/prometheus.yml
+        -v /tmp/provisions/config/prometheus.yml:/etc/prometheus/prometheus.yml \
         -v /data:/prom/prometheus/data \
         prom/prometheus:latest

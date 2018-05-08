@@ -77,6 +77,7 @@ echo "Variables file    : ${VARIABLES}"
 echo "Using Trust arg   : ${ADD_TRUST}"
 echo " "
 
+#TODO on-error should be changed to 'cleanup' for production and up the 'ssh_handshake_attempts' value to 50 in the template
 sudo docker run -it \
     --name promBuilder \
     --env-file=docker.env \
@@ -88,6 +89,7 @@ sudo docker run -it \
         -only=${BUILD_NAME} \
         -var-file=${CREDENTIALS} \
         -var-file=${VARIABLES} \
+        -on-error=ask \
         ${TEMPLATE}
 
 sudo docker rm promBuilder
