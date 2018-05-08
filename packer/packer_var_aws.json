@@ -1,0 +1,13 @@
+{
+	"bot_user_name": "{your_user_name}",
+    "bot_user_pass": "{your_user_password}",
+	"newuser_name": "newuser",
+	"newuser_pass": "{newuser_password}",
+	"aws_region": "us-east-1",
+  	"aws_zone": "us-east-1b",
+  	"aws_security_group": "sg-",
+  	"aws_vpc_id": "vpc-",
+  	"aws_subnet_id": "subnet-",
+  	"source_ami_owner": "",
+  	"source_name_filter": ""
+}
