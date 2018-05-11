@@ -45,18 +45,21 @@ resource "aws_instance" "prometheus" {
   }
 
   provisioner "remote-exec" {
-    inline = ["sudo mkdir -m 755 -p /tmp/prometheus"]
+    inline = ["mkdir -m 755 -p /tmp/prometheus"]
   }
 
   #The start script replaces the original files placed in the AMI with
   #any that have been added to the prometheus_files directory
   provisioner "file" {
-    source = "../provisions/"
-    destination = "/tmp/prometheus/"
+    source = "provisions/"
+    destination = "/tmp/prometheus"
   }
 
   provisioner "remote-exec" {
-    inline = ["/tmp/prometheus/start_prom.sh"]
+    inline = ["cd /tmp/prometheus",
+      "chmod 755 start_prom.sh",
+      "./start_prom.sh"
+    ]
   }
 
 }

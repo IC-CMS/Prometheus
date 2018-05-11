@@ -87,6 +87,7 @@ do
     cp ${file} ${BUILD_DIR}/${file//.${PLATFORM}}
 done
 
+cp -r provisions/ ${BUILD_DIR}
 cd ${BUILD_DIR}
 
 #TODO on-error should be changed to 'cleanup' for production and up the 'ssh_handshake_attempts' value to 50 in the template

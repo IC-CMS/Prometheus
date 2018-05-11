@@ -12,17 +12,21 @@ REPLACEMENTS_DIR='/tmp/prometheus/config_prometheus'
 PROM_CONFIG='/prometheus.yml'
 PROM_ALERT='/alert.rules'
 
+sudo mkdir /etc/prometheus
 if [ -f ${REPLACEMENTS_DIR}${PROM_CONFIG} ]
   then
-    cp ${REPLACEMENTS_DIR}${PROM_CONFIG} /etc/prometheus/prometheus.yml
-    echo 'Using ${PROM_CONFIG} from ${REPLACEMENTS_DIR}${PROM_CONFIG}'
+    sudo cp ${REPLACEMENTS_DIR}${PROM_CONFIG} /etc/prometheus/prometheus.yml
+    echo 'Using '${PROM_CONFIG}' from '${REPLACEMENTS_DIR}${PROM_CONFIG}
 fi
 
 if [ -f ${REPLACEMENTS_DIR}${PROM_ALERT} ]
   then
-    cp ${REPLACEMENTS_DIR}${PROM_ALERT} /etc/prometheus/alert.rules
-    echo 'Using ${PROM_ALERT} from ${REPLACEMENTS_DIR}${PROM_ALERT}'
+    sudo cp ${REPLACEMENTS_DIR}${PROM_ALERT} /etc/prometheus/alert.rules
+    echo 'Using '${PROM_ALERT}' from '${REPLACEMENTS_DIR}${PROM_ALERT}
 fi
 
+#Temp until I remove the prometheus container from the AMI
+sudo docker rm prometheus
+
 #Start Prometheus
-sudo $(pwd)/docker-compose up -d
+sudo docker-compose up -d
