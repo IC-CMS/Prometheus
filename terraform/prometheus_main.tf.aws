@@ -1,0 +1,62 @@
+####################################
+# Security Groups
+####################################
+resource "aws_security_group" "prometheus" {
+  name = "prometheus"
+  description = "Security Group for Prometheus instances"
+  vpc_id = "${var.aws["vpc_id"]}"
+
+  tags {
+    Name = "prometheus_from_all"
+  }
+
+  ingress {
+    from_port = 9090
+    to_port = 9090
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+}
+
+####################################
+# Prometheus Instance
+####################################
+resource "aws_instance" "prometheus" {
+  ami = "${var.aws["ami"]}"
+  count = "${var.aws["count"]}"
+  instance_type = "${var.aws["instance_type"]}"
+  availability_zone = "${var.aws["zone"]}"
+  subnet_id = "${var.aws["subnet_id"]}"
+  vpc_security_group_ids = "${var.aws_security_groups}"
+  associate_public_ip_address = false
+
+  connection {
+    type = "ssh"
+    user = "${var.aws["ssh_user_name"]}"
+    password = "${var.aws["ssh_user_password"]}"
+  }
+
+  provisioner "remote-exec" {
+    inline = ["sudo mkdir -m 755 -p /tmp/prometheus"]
+  }
+
+  #The start script replaces the original files placed in the AMI with
+  #any that have been added to the prometheus_files directory
+  provisioner "file" {
+    source = "../provisions/"
+    destination = "/tmp/prometheus/"
+  }
+
+  provisioner "remote-exec" {
+    inline = ["/tmp/prometheus/start_prom.sh"]
+  }
+
+}

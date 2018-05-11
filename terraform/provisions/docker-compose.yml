@@ -1,0 +1,19 @@
+version: '3'
+services:
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:latest
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+    command: --storage.tsdb.retention=15d
+    network_mode: "host"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ${PROMETHEUS_CONFIG}:/etc/prometheus/prometheus.yml
+      - ${PROMETHEUS_ALERTS}:/etc/prometheus/alert.rules
+      - ${PROMETHEUS_DATA}:/prom/prometheus/data
+#    environment:

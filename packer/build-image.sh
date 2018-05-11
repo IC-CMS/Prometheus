@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 #Instructions
 #Using the Packer Template file for the project
@@ -57,12 +57,12 @@ done
 shift $((OPTIND-1))
 
 if [ -z "${BUILD_NAME}" ]
-then
+  then
     echo "*** The -b <build name> argument is required"
     usage
     exit 1
 elif [ "aws2_builder" = "${BUILD_NAME}" ]
-then
+  then
     echo "Adding Trust store"
     ADD_TRUST='-v '$(pwd)'/AllTrusted.crt:/etc/pki/tls/certs/AllTrusted.crt'
 fi
@@ -78,7 +78,7 @@ echo "Using Trust arg   : ${ADD_TRUST}"
 echo " "
 
 #TODO on-error should be changed to 'cleanup' for production and up the 'ssh_handshake_attempts' value to 50 in the template
-sudo docker run -it \
+sudo docker run -it --rm\
     --name promBuilder \
     --env-file=docker.env \
     -v $(pwd):/tmp/prometheus \
@@ -92,4 +92,4 @@ sudo docker run -it \
         -on-error=ask \
         ${TEMPLATE}
 
-sudo docker rm promBuilder
+sudo docker container prune -f

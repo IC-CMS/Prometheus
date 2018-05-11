@@ -116,10 +116,12 @@
     {
       "type": "shell",
       "inline": ["echo '***************************** Preparing Prometheus *********************************'",
-                  "cd /tmp/provisions/scripts/",
-                  "./prometheus_setup.sh",
-                 "echo '************************** Removing cloud directory ********************************'",
-                 "sudo rm -Rf /var/lib/cloud/*"
+        "cd /tmp/provisions/scripts/",
+        "./prometheus_setup.sh",
+        "echo '************************** Removing cloud directory ********************************'",
+        "sudo rm -Rf /var/lib/cloud/*",
+        "echo '************************** Cleaning up directory ***************************'",
+        "cd / && sudo rm -Rf /tmp/provisions"
       ]
     }
   ]

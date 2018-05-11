@@ -1,3 +1,10 @@
 packer_var_pac.json
+variables.tf.pac
+variables.pac.tf
+
+buildStash/
+aws_credentials.json
+
+terraform.log
 packer.log
 .idea/

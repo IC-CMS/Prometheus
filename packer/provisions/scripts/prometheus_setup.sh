@@ -59,15 +59,20 @@ sudo mkdir -m 777 /data
 #echo "/dev/xvdf /data ext3 defaults,nofail 0 2" | sudo tee -a /etc/fstab
 #sudo mount -a
 
+sudo mkdir -m 755 -p /etc/prometheus
+sudo cp /tmp/provisions/config/prometheus.yml /etc/prometheus/prometheus.yml
+sudo cp /tmp/provisions/config/alert.rules /etc/prometheus/alert.rules
+
 #Clean out the certs and run the docker container for Prometheus
 sudo rm -Rf /root/.docker
 
-sudo ${DOCKER} run -d \
-        --name prometheus \
-        -p 9090:9090 \
-        --restart=on-failure:10 \
-        --network="host" \
-        -v /tmp/provisions/config/alert.rules:/etc/prometheus/alert.rules \
-        -v /tmp/provisions/config/prometheus.yml:/etc/prometheus/prometheus.yml \
-        -v /data:/prom/prometheus/data \
-        prom/prometheus:latest
+#This is now in the docker-compose file for terraform
+#sudo ${DOCKER} run -d \
+#        --name prometheus \
+#        -p 9090:9090 \
+#        --restart=on-failure:10 \
+#        --network="host" \
+#        -v /tmp/provisions/config/alert.rules:/etc/prometheus/alert.rules \
+#        -v /tmp/provisions/config/prometheus.yml:/etc/prometheus/prometheus.yml \
+#        -v /data:/prom/prometheus/data \
+#        prom/prometheus:latest

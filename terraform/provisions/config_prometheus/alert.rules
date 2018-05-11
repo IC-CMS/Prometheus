@@ -1,0 +1,13 @@
+## alert.rules ##
+
+
+groups:
+  - name: example
+    rules:
+
+    # Alert for any instance that is unreachable for > 5 mins.
+    - alert: Instance_Down
+      expr: up == 0
+      for: 1m
+      labels:
+        severity: page
