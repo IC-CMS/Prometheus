@@ -2,7 +2,7 @@ packer_var_pac.json
 variables.tf.pac
 variables.pac.tf
 
-buildStash/
+buildStash*
 aws_credentials.json
 
 terraform.log

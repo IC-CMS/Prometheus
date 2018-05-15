@@ -79,7 +79,7 @@ echo " "
 
 #Add all terraform resources to the build directory
 mkdir -m 755 -p ${BUILD_DIR}
-files=("${CREDENTIALS}" "prometheus_main.tf.${PLATFORM}" "provider.tf.${PLATFORM}" "variables.tf")
+files=("${CREDENTIALS}" "prometheus_main.tf.${PLATFORM}" "provider.tf.${PLATFORM}" "variables.pac.tf")
 
 for file in "${files[@]}"
 do

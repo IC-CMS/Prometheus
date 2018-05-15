@@ -99,7 +99,7 @@
       "ssh_password": "{{user `newuser_pass`}}",
       "ssh_pty": "true",
       "cacert": "{{user `cert_location`}}",
-      "floating_ip": "{{user `temp_floating_ip'}}"
+      "floating_ip": "{{user `temp_floating_ip`}}"
     }],
   "provisioners": [
     {
